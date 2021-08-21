@@ -1,7 +1,7 @@
 module.exports.config = {
 	name:"upt",
 	version: "1.0.0",
-	hasPermssion: 2,
+	hasPermssion: 0,
 	credits: "JRT",
 	description: "Random ảnh theo api - uptime",
 	commandCategory: "Hệ thống admin-bot",
@@ -23,11 +23,12 @@ const time = process.uptime(),
 		seconds = Math.floor(time % 60);
 	const pidusage = await global.nodemodule["pidusage"](process.pid);
 	const timeStart = Date.now();
+	let today = new Date();
 	axios.get('https://api.vangbanlanhat.tk/image?type=boy').then(res => {
 	let ext = res.data.data.substring(res.data.data.lastIndexOf(".") + 1);
 	let callback = function () {
 					api.sendMessage({
-                                                body: `Thời gian hoạt động của BOT là ${hours} giờ ${minutes} phút ${seconds} giây <3.\n\n❯ Tổng người dùng: ${global.data.allUserID.length}\n❯ Tổng nhóm: ${global.data.allThreadID.length}\n❯ Cpu đang sử dụng: ${pidusage.cpu.toFixed(1)}\n❯ Ram đang sử dụng: ${byte2mb(pidusage.memory)}\n❯ Ping: ${Date.now() - timeStart}ms\nCác bạn nhớ tránh để spam bot đấy <3\nBot made by JRT ✔`,
+                                                body: `Bot của Sieu Dang Yeu đã hoạt động được ${hours} giờ ${minutes} phút ${seconds} giây ❤️🖕.\n\n❯ Tổng người dùng: ${global.data.allUserID.length}\n❯ Tổng nhóm: ${global.data.allThreadID.length}\n❯ Cpu đang sử dụng: ${pidusage.cpu.toFixed(1)}\n❯ Ram đang sử dụng: ${byte2mb(pidusage.memory)}\n❯ Ping: ${Date.now() - timeStart}\n❯Bây Giờ Là:${today}`,
 						attachment: fs.createReadStream(__dirname + `/cache/anh.${ext}`)
 					}, event.threadID, () => fs.unlinkSync(__dirname + `/cache/anh.${ext}`), event.messageID);
 				};
