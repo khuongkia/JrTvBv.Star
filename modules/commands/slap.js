@@ -19,7 +19,7 @@ module.exports.config = {
         "jimp": ""
     },
     envConfig: {
-        APIKEY: "MEWbmhkanJ0MjAwMztkYW5nejEyMzQ1Njc4OXpAZ21haWwuY29t"
+        APIKEY: ""
     }
 };
 
