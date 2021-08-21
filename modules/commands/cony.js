@@ -1,4 +1,3 @@
-const fs = require("fs");
 module.exports.config = {
 	name: "cony",
 	version: "1.0.0", 
@@ -6,18 +5,13 @@ module.exports.config = {
 	credits: "JRT",
 	description: "Tỉ lệ có Ny của bạn trong năm nay",
 	commandCategory: "Game", 
-	usages: "cony", 
+	usages: "", 
 	cooldowns: 0,
 	dependencies: [] 
 };
-module.exports.run = async function({ api, event, args, Users, Threads, __GLOBAL, Currencies }) {
-	var tl = ['21%', '67%', '19%', '37%', '17%', '96%', '52%', '62%', '76%', '83%', '100%', '99%', "0%", "48%",`1%`,`10%`,`99,9%`];
-	var tle = tl[Math.floor(Math.random() * tl.length)];
-	let data = await api.getUserInfo(event.senderID);
-    let name = await data[event.senderID].name
-    var msg = {
-				body: `Chúc mừng bạn ${name}. Bot đã dự đoán tỉ lệ có người yêu của bạn trong năm nay là ${tle} ❤❤`,
-				attachment: fs.createReadStream(__dirname + `/cache/chucmung.gif`)
-			}
-			api.sendMessage(msg, event.threadID, event.messageID);
-		}
+module.exports.run = async function({ api, event, Users }) {
+    var tle = Math.floor(Math.random() * 101);
+    var name = (await Users.getData(event.senderID)).name
+        var msg = {body: `🎉Chúc mừng ${name}\n🤤Tỉ lệ có người yêu của bạn là: ${tle}%\nNếu bạn có người đó thì hãy yêu thương thật lòng nhé >,< <3`}
+        return api.sendMessage(msg, event.threadID, event.messageID)
+      }
