@@ -7,15 +7,14 @@
     "autoClean": true,
     "commandDisabled": [],
     "eventDisabled": [],
-    "EMAIL": "ledah60620@javhold.com",
-    "PASSWORD": "nhd159632",
-    "OTPKEY": "UMW3 TXCW UKEA R5GD Z3GO WQYA ZXIC SUIB",
-    "BOTNAME": "Ʀ祝♚Ɗ๏͜͡๏ɱ์㕙۵",
-    "PREFIX": "-",
+    "EMAIL": "",
+    "PASSWORD": "",
+    "OTPKEY": "",
+    "BOTNAME": "",
+    "PREFIX": "",
     "ADMINBOT": [
-        "100033478361032",
-        "100024164200125",
-        "100022113516016"
+        "ADMIN1",
+        "ADMIN2"
     ],
     "DATABASE": {
         "sqlite": {
