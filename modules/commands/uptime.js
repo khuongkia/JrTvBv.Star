@@ -1,5 +1,5 @@
 module.exports.config = {
-	name:"upt",
+	name:"uptime",
 	version: "1.0.0",
 	hasPermssion: 0,
 	credits: "JRT",
@@ -17,21 +17,28 @@ module.exports.run = async ({ api, event }) => {
 	const axios = require('axios');
 	const request = require('request');
 	const fs = require("fs");
-const time = process.uptime(),
+  const time = process.uptime(),
 		hours = Math.floor(time / (60 * 60)),
 		minutes = Math.floor((time % (60 * 60)) / 60),
 		seconds = Math.floor(time % 60);
-	const pidusage = await global.nodemodule["pidusage"](process.pid);
+  const pidusage = await global.nodemodule["pidusage"](process.pid);
+  const res = await axios.get(`https://api.vangbanlanhat.tk/other?type=calendar`);
+  var hour = res.data.data.time.hour;
+  var minute = res.data.data.time.minute;
+  var second = res.data.data.time.second;
+  var day = res.data.data.solar.day;
+  var month = res.data.data.solar.month;
+  var year = res.data.data.solar.year;
 	const timeStart = Date.now();
 	let today = new Date();
 	axios.get('https://api.vangbanlanhat.tk/image?type=boy').then(res => {
 	let ext = res.data.data.substring(res.data.data.lastIndexOf(".") + 1);
 	let callback = function () {
 					api.sendMessage({
-                                                body: `Bot của Sieu Dang Yeu đã hoạt động được ${hours} giờ ${minutes} phút ${seconds} giây ❤️🖕.\n\n❯ Tổng người dùng: ${global.data.allUserID.length}\n❯ Tổng nhóm: ${global.data.allThreadID.length}\n❯ Cpu đang sử dụng: ${pidusage.cpu.toFixed(1)}\n❯ Ram đang sử dụng: ${byte2mb(pidusage.memory)}\n❯ Ping: ${Date.now() - timeStart}\n❯Bây Giờ Là:${today}`,
-						attachment: fs.createReadStream(__dirname + `/cache/anh.${ext}`)
-					}, event.threadID, () => fs.unlinkSync(__dirname + `/cache/anh.${ext}`), event.messageID);
+                                                body: `📅Hôm này là: ${day}/${month}/${year}\n⏰Thời gian: ${hour}:${minute}:${second}\n📌Bot của JRT đã hoạt động được ${hours} giờ ${minutes} phút ${seconds} giây ❤️.\n💎🍃Prefix: #\n💎💧Version: 1.2.14\n💎👤Tổng người dùng: ${global.data.allUserID.length}\n💎👀Tổng Nhóm: ${global.data.allThreadID.length}\n💎🌬Cpu đang sử dụng: ${pidusage.cpu.toFixed(1)}\n💎⚡Ram đang sử dụng: ${byte2mb(pidusage.memory)}\n💎🌠Ping: ${Date.now() - timeStart}ms\n\n☠ This bot was made by JRT ☠`,
+						attachment: fs.createReadStream(__dirname + `/cache/boy.${ext}`)
+					}, event.threadID, () => fs.unlinkSync(__dirname + `/cache/boy.${ext}`), event.messageID);
 				};
-				request(res.data.data).pipe(fs.createWriteStream(__dirname + `/cache/anh.${ext}`)).on("close", callback);
+				request(res.data.data).pipe(fs.createWriteStream(__dirname + `/cache/boy.${ext}`)).on("close", callback);
 			})
 }
