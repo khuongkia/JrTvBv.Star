@@ -1,84 +1,64 @@
 module.exports.config = {
 	name: "setexp",
-	version: "1.0.0",
+	version: "0.0.1",
 	hasPermssion: 2,
-	credits: "manhIT",
-	description: "Điều chỉnh thông tin của người dùng",
+	credits: "JRT",
+	description: "thay đổi số tiền của bản thân hoặc người được tag",
 	commandCategory: "Tiền tệ",
-	usages: "[add/set/clean] [Số exp] [Tag người dùng]",
-	cooldowns: 5
+	usages: "setexp [Tag]",
+	cooldowns: 5,
+	info: [
+		{
+			key: 'Tag',
+			prompt: 'Để trống hoặc tag một người nào đó, có thể tag nhiều người',
+			type: 'Văn Bản',
+			example: '@JRT'
+		}
+	]
 };
 
-module.exports.run = async function ({ event, api, Currencies, args }) {
-    const { threadID, messageID, senderID } = event;
-    const { throwError }          = global.utils;
-    const mentionID               = Object.keys(event.mentions);
-    const exp                   = parseInt(args[1]);
+module.exports.run = async function({ api, event, args, Currencies, utils, Users}) {
+var mention = Object.keys(event.mentions)[0];
+    var prefix = ";"
+    var {body} = event;
+    var kong = 0;
+    			var content = body.slice(prefix.length + 9, body.length);
+			var sender = content.slice(0, content.lastIndexOf(" "));
+			var expSet = content.substring(content.lastIndexOf(" ") + 1);
+    			if (args[0]=='me'){
+    			 return api.sendMessage(`Đã thay đổi số exp của bạn thành ${expSet}`, event.threadID, async() => {await Currencies.setData(event.senderID, {exp: parseInt(expSet)})}, event.messageID);
+			}
+			else if(args[0]=="del"){
+if (args[1] == 'me'){
+			var s = event.senderID;
+			const expme =(await Currencies.getData(event.senderID)).exp;
+			api.sendMessage(`✅Đã xoá toàn bộ số exp của bạn\nSố exp xoá là ${expme}.`, event.threadID, async() => {await Currencies.setData(event.senderID, {exp: parseInt(kong)})});
+		}	
+		else if (Object.keys(event.mentions).length == 1) {
+var mention = Object.keys(event.mentions);
+		const expdel = (await Currencies.getData(mention)).exp;
+		api.sendMessage(`✅Đã xoá toàn bộ số exp của ${event.mentions[mention].replace("@", "")}\nSố exp xoá là ${expdel}.`, event.threadID, async() => {await Currencies.setData(mention, {exp: parseInt(kong)})});
+		}
+		
+		else return	api.sendMessage("sai cú pháp", event.threadID, event.messageID);
+		}
+			else if (Object.keys(event.mentions).length == 1) {
+			return api.sendMessage({
+				body: (`Đã thay đổi số exp của ${event.mentions[mention].replace("@", "")} thành ${expSet}`),
+				mentions: [{
+					tag: event.mentions[mention].replace("@", ""),
+					id: parseInt(mention)
+				}]
+			}, event.threadID, async () => {await Currencies.setData(mention, {exp: parseInt(expSet)})});
+		}
+		else if(args[0]=="UID"){
+		var id = args[1];
+		var cut = args[2];
+		let nameeee = (await Users.getData(id)).name
+		   return api.sendMessage(`Đã thay đổi số exp của ${nameeee} thành ${cut}`, event.threadID, async() => {await Currencies.setData(id, {exp: parseInt(cut)})}, event.messageID);
 
-    var message                   = [];
-    var error                     = [];
-
-    switch (args[0]) {
-        case "add": {
-            if (mentionID.length != 0) {
-                for (singleID of mentionID) {
-                    if (!exp || isNaN(exp)) return throwError(this.config.name, threadID, messageID);
-                    try {
-                        await Currencies.increaseexp(singleID, exp);
-                        message.push(singleID);
-                    } catch (e) { error.push(e);  console.log(e) };
-                }
-                return api.sendMessage(`[exp] Đã cộng thêm ${exp}$ cho ${message.length} người`, threadID, function () { if (error.length != 0) return api.sendMessage(`[Error] Không thể thể cộng thêm exp cho ${error.length} người!`, threadID) }, messageID);
-            } else {
-                if (!exp || isNaN(exp)) return throwError(this.config.name, threadID, messageID);
-                try {
-                    await Currencies.increaseexp(senderID, exp);
-                    message.push(senderID);
-                } catch (e) { error.push(e) };
-                return api.sendMessage(`[exp] Đã cộng thêm ${exp}$ cho bản thân`, threadID, function () { if (error.length != 0) return api.sendMessage(`[Error] Không thể thể cộng thêm exp cho bản thân!`, threadID) }, messageID);
-            }
-        }
-
-        case "set": {
-            if (mentionID.length != 0) {
-                for (singleID of mentionID) {
-                    if (!exp || isNaN(exp)) return throwError(this.config.name, threadID, messageID);
-                    try {
-                        await Currencies.setData(singleID, { exp });
-                        message.push(singleID);
-                    } catch (e) { error.push(e) };
-                }
-                return api.sendMessage(`[exp] Đã set thành công ${exp}$ cho ${message.length} người`, threadID, function () { if (error.length != 0) return api.sendMessage(`[Error] Không thể set exp cho ${error.length} người!`, threadID) }, messageID);
-            } else {
-                if (!exp || isNaN(exp)) return throwError(this.config.name, threadID, messageID);
-                try {
-                    await Currencies.setData(senderID, { exp });
-                    message.push(senderID);
-                } catch (e) { error.push(e) };
-                return api.sendMessage(`[exp] Đã set thành công ${exp}$ cho bản thân`, threadID, function () { if (error.length != 0) return api.sendMessage(`[Error] Không thể set exp cho bản thân!`, threadID) }, messageID);
-            }
-        }
-
-        case "clean": {
-            if (mentionID.length != 0) {
-                for (singleID of mentionID) {
-                    try {
-                        await Currencies.setData(singleID, { exp: 0 });
-                        message.push(singleID);
-                    } catch (e) { error.push(e) };
-                }
-                return api.sendMessage(`[exp] Đã xóa thành công toàn bộ exp của ${message.length} người`, threadID, function () { if (error.length != 0) return api.sendMessage(`[Error] Không thể xóa toàn bộ exp của ${error.length} người!`, threadID) }, messageID);
-            } else {
-                try {
-                    await Currencies.setData(senderID, { exp: 0 });
-                    message.push(senderID);
-                } catch (e) { error.push(e) };
-                return api.sendMessage(`[exp] Đã xóa thành công exp của cho bản thân`, threadID, function () { if (error.length != 0) return api.sendMessage(`[Error] Không thể xóa toàn bộ exp của bản thân!`, threadID) }, messageID);
-            }
-        }
-        
-        default: {
-            return global.utils.throwError(this.config.name, threadID, messageID);
-        }
-    }
+		}
+else {
+	api.sendMessage("sai cú pháp", event.threadID, event.messageID)
+	}
 }
