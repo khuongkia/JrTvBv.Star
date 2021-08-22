@@ -1,5 +1,5 @@
 /**
-* @author ProCoderMew
+* @author JRT
 * @warn Do not edit code or edit credits
 */
 
@@ -9,7 +9,7 @@ module.exports.config = {
     hasPermssion: 0,
     credits: "JRT",
     description: "",
-    commandCategory: "Game",
+    commandCategory: "Giải trí",
     usages: "[@tag]",
     cooldowns: 5,
     dependencies: {
@@ -17,43 +17,45 @@ module.exports.config = {
         "fs-extra": "",
         "path": "",
         "jimp": ""
-    },
-    envConfig: {
-        APIKEY: ""
     }
 };
 
-module.exports.onLoad = async() => {
-    const { resolve } = global.nodemodule["path"];
-    const { existsSync, mkdirSync } = global.nodemodule["fs-extra"];
-    const { downloadFile } = global.utils;
+module.exports.onLoad = () => {
+    const fs = require("fs-extra");
+    const request = require("request");
     const dirMaterial = __dirname + `/cache/canvas/`;
-    const path = resolve(__dirname, 'cache/canvas', 'hit_butt.png');
-    if (!existsSync(dirMaterial + "canvas")) mkdirSync(dirMaterial, { recursive: true });
-    if (!existsSync(path)) await downloadFile("https://git.meewmeew.info/data/hitbutt.png", path);
+    if (!fs.existsSync(dirMaterial + "canvas")) fs.mkdirSync(dirMaterial, { recursive: true });
+    if (!fs.existsSync(dirMaterial + "hitbut.png")) request("https://i.imgur.com/xG0gf6O.png").pipe(fs.createWriteStream(dirMaterial + "hitbut.png"));
 }
 
-async function makeImage({ one, two }) {
-    const { APIKEY } = global.configModule.hitbutt;
-    const fs = global.nodemodule["fs-extra"];
-    const path = global.nodemodule["path"];
-    const axios = global.nodemodule["axios"]; 
-    const jimp = global.nodemodule["jimp"];
+async function makeImage({ one, two }) {    
+    const axios = require("axios");
+    const fs = require("fs-extra");
+    const path = require("path");
+    const jimp = require("jimp");
     const __root = path.resolve(__dirname, "cache", "canvas");
 
-    let hit_butt_img = await jimp.read(__root + "/hit_butt.png");
-    let pathImg = __root + `/hit_butt_${one}_${two}.png`;
-
-    let avatarOne = (await axios.get(`https://meewmeew.info/avatar/${one}?apiey=${APIKEY}`)).data;    
-    let avatarTwo = (await axios.get(`https://meewmeew.info/avatar/${two}?apiey=${APIKEY}`)).data;
+    let slap_image = await jimp.read(__root + "/hitbut.png");
+    let pathImg = __root + `/slap_${one}_${two}.png`;
+    let avatarOne = __root + `/avt_${one}.png`;
+    let avatarTwo = __root + `/avt_${two}.png`;
     
-    let circleOne = await jimp.read(await circle(Buffer.from(avatarOne, 'utf-8')));
-    let circleTwo = await jimp.read(await circle(Buffer.from(avatarTwo, 'utf-8')));
-    hit_butt_img.resize(500, 500).composite(circleOne.resize(130, 130), 225, 5).composite(circleTwo.resize(120, 120), 352, 220);
+    let getAvatarOne = (await axios.get(`https://le31.glitch.me/avt?q=${one}`, { responseType: 'arraybuffer' })).data;
+    fs.writeFileSync(avatarOne, Buffer.from(getAvatarOne, 'utf-8'));
     
-    let raw = await hit_butt_img.getBufferAsync("image/png");
+    let getAvatarTwo = (await axios.get(`https://le31.glitch.me/avt?q=${two}`, { responseType: 'arraybuffer' })).data;
+    fs.writeFileSync(avatarTwo, Buffer.from(getAvatarTwo, 'utf-8'));
+    
+    let circleOne = await jimp.read(await circle(avatarOne));
+    let circleTwo = await jimp.read(await circle(avatarTwo));
+    slap_image.resize(500, 500).composite(circleOne.resize(130, 130), 225, 5).composite(circleTwo.resize(120, 120), 352, 220);
+    
+    let raw = await slap_image.getBufferAsync("image/png");
     
     fs.writeFileSync(pathImg, raw);
+    fs.unlinkSync(avatarOne);
+    fs.unlinkSync(avatarTwo);
+    
     return pathImg;
 }
 async function circle(image) {
@@ -63,13 +65,13 @@ async function circle(image) {
     return await image.getBufferAsync("image/png");
 }
 
-module.exports.run = async function ({ event, api, args }) {    
-    const fs = global.nodemodule["fs-extra"];
-    const { threadID, messageID, senderID } = event;
-    const mention = Object.keys(event.mentions);
-    if (!mention[0]) return api.sendMessage("Vui lòng tag 1 người.", threadID, messageID);
+module.exports.run = async function ({ event, api, args, client }) {
+    const fs = require("fs-extra");
+    let { threadID, messageID, senderID } = event;
+    var mention = Object.keys(event.mentions);
+    if (!mention) return api.sendMessage("Vui lòng tag 1 người", threadID, messageID);
     else {
-        const one = senderID, two = mention[0];
-        return makeImage({ one, two }).then(path => api.sendMessage({ body: "Hư nè.. ", attachment: fs.createReadStream(path) }, threadID, () => fs.unlinkSync(path), messageID));
+        var one = senderID, two = mention[0];
+        return makeImage({ one, two }).then(path => api.sendMessage({ body: "Hư nè", attachment: fs.createReadStream(path) }, threadID, () => fs.unlinkSync(path), messageID));
     }
 }
